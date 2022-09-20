@@ -1,0 +1,21 @@
+.gallery-section {
+  padding-top: 15px;
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.photo-card {
+}
+
+.info {
+  display: flex;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}

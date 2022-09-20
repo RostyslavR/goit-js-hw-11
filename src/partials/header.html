@@ -1,0 +1,51 @@
+<header class="header">
+  <div class="container header-container">
+    <form class="search-form" id="search-form">
+      <div class="set-block">
+        <div class="filter">
+          <label>
+            <input type="checkbox" name="image_type" value="photo" />
+            photo
+          </label>
+          <label>
+            <input type="checkbox" name="orientation" value="horizontal" />
+            horizontal
+          </label>
+          <label>
+            <input type="checkbox" name="safesearch" value="true" />
+            safesearch
+          </label>
+        </div>
+        <div class="pagination">
+          <span>pagination</span>
+          <label>
+            <input type="number" name="per_page" value="3" />
+            per page
+          </label>
+        </div>
+      </div>
+      <div class="searh-block">
+        <input
+          type="text"
+          name="searchQuery"
+          autocomplete="off"
+          placeholder="Search images..."
+        />
+        <button type="submit">Search</button>
+      </div>
+    </form>
+    <div class="info-block">
+      <button type="button" class="load-next">Load next</button>
+      <button type="button" class="load-more">Load more</button>
+      <button type="button" class="go-top">Go top</button>
+
+      <p id="total-images">0 images found</p>
+      <p id="available-images">0 images available</p>
+      <p id="total-pages">0 pages</p>
+      <label
+        >page
+        <input type="number" name="page" value="0" />
+      </label>
+    </div>
+  </div>
+</header>
