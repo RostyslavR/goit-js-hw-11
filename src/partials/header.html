@@ -17,7 +17,7 @@
           </label>
         </div>
         <div class="pagination">
-          <span>pagination</span>
+          <p>pagination</p>
           <label>
             <input type="number" name="per_page" value="3" />
             per page
@@ -35,17 +35,15 @@
       </div>
     </form>
     <div class="info-block">
-      <button type="button" class="load-next">Load next</button>
-      <button type="button" class="load-more">Load more</button>
-      <button type="button" class="go-top">Go top</button>
-
-      <p id="total-images">0 images found</p>
-      <p id="available-images">0 images available</p>
-      <p id="total-pages">0 pages</p>
-      <label
-        >page
-        <input type="number" name="page" value="0" />
-      </label>
+      <div id="total-images">0 images found</div>
+      <div id="available-images">0 images available</div>
+      <div id="total-pages">0 pages</div>
+      <div id="loaded-pages">loaded 0</div>
+    </div>
+    <div class="btn-block">
+      <button type="button" class="next-page">next page</button>
+      <button type="button" class="load-more" hidden>Load more</button>
+      <button type="button" class="go-top" hidden>Go top</button>
     </div>
   </div>
 </header>

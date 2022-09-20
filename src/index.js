@@ -3,21 +3,68 @@ import axios from 'axios';
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '1631539-db8210cabd2636c6df59812df';
 
-refSearchForm = document.querySelector('#search-form');
-refGallery = document.querySelector('.gallery');
+let page = 1;
+let startPage = page;
+let query = '';
+
+const refSearchForm = document.querySelector('#search-form');
+const refGallery = document.querySelector('.gallery');
+const refLoadMore = document.querySelector('.load-more');
+const refNextPage = document.querySelector('.next-page');
+const refGoTop = document.querySelector('.go-top');
+
+const refLoadedPages = document.querySelector('#loaded-pages');
 
 refSearchForm.addEventListener('submit', onSubmit);
+refLoadMore.addEventListener('click', onMoreClick);
+refNextPage.addEventListener('click', onNextClick);
+refGoTop.addEventListener('click', onGoTopClick);
+
+window.addEventListener('scroll', onScroll);
+
+function onScroll() {
+  const { scrollHeight, clientHeight } = document.documentElement;
+  refGoTop.hidden = scrollY < clientHeight;
+  // refLoadMore.hidden = scrollY < scrollHeight - clientHeight - 400;
+  if (scrollY > scrollHeight - clientHeight - 400) {
+    onMoreClick();
+  }
+
+  // console.log({ scrollY, scrollTop, scrollHeight, clientHeight });
+}
+
+function onMoreClick() {
+  page += 1;
+  showImages();
+}
+
+function onGoTopClick() {
+  page = startPage;
+  window.scrollTo(scrollY, 0);
+}
+
+function onNextClick() {
+  page += 1;
+  refGallery.innerHTML = '';
+  showImages();
+}
 
 //********************4 axios */
 function onSubmit(evt) {
   evt.preventDefault();
-  query = evt.currentTarget.searchQuery.value.trim().replace(' ', '+');
-  const url = `${BASE_URL}?key=${API_KEY}&image_type=photo&per_page=40&page=1&orientation=horizontal&q=${query}`;
-  showImages(url);
+  query = evt.currentTarget.searchQuery.value
+    .trim()
+    .replace(/ {2,}/g, ' ')
+    .replace(/ /g, '+');
+  refGallery.innerHTML = '';
+  page = 1;
+  showImages();
 }
-async function showImages(url) {
+async function showImages() {
+  const url = `${BASE_URL}?key=${API_KEY}&image_type=photo&per_page=10&page=${page}&orientation=horizontal&q=${query}`;
   const { data } = await axios(url);
   renderingGallery(data.hits);
+  refLoadedPages.textContent = `loaded ${page}`;
 }
 
 //********************3 axios */

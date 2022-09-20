@@ -1,14 +1,9 @@
 .header {
   position: fixed;
-  width: 100%;
+  width: 100vw;
   // height: 100px;
   background-color: aquamarine;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.6);
-}
-
-.container {
-  width: 100%;
-  padding: 0 15px;
 }
 
 .header-container {
@@ -19,20 +14,24 @@
 }
 
 .filter,
-.page {
+.pagenation,
+.btn-block {
   display: flex;
   flex-direction: column;
 }
 
 .set-block {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 30%;
 }
 
 .search-form {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 60%;
+  width: 70%;
 }
 
 input[name='searchQuery'] {
@@ -58,13 +57,13 @@ input[name='searchQuery'] {
 
 button[type='submit'] {
   // margin-left: 10px;
-  width: 100px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
 
   font-weight: 600;
   letter-spacing: 0.04em;
 
-  border-radius: 4px 4px;
+  border-radius: 50%;
   border-style: none;
 
   // background-color: #334764;
@@ -78,5 +77,5 @@ button[type='submit'] {
 
 [name='per_page'],
 [name='page'] {
-  width: 10ch;
+  width: 6ch;
 }
