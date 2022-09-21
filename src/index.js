@@ -1,132 +1,66 @@
+import debounce from 'lodash.debounce';
 import axios from 'axios';
+import refs from './js/refs';
+import PixabayApiService from './js/pixabay-service';
+import GalleryRender from './js/gallery-render';
 
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '1631539-db8210cabd2636c6df59812df';
+const DEBOUNCE_DELAY = 20;
 
-let page = 1;
-let startPage = page;
-let query = '';
+const pixabay = new PixabayApiService();
+const gallery = new GalleryRender(refs.gallery);
 
-const refSearchForm = document.querySelector('#search-form');
-const refGallery = document.querySelector('.gallery');
-const refLoadMore = document.querySelector('.load-more');
-const refNextPage = document.querySelector('.next-page');
-const refGoTop = document.querySelector('.go-top');
+let page = 0;
+let totalPage = 0;
 
-const refLoadedPages = document.querySelector('#loaded-pages');
+refs.searchForm.addEventListener('submit', onSubmit);
+refs.goTopBtn.addEventListener('click', onGoTopClick);
+refs.addPageBtn.addEventListener('click', addPage);
 
-refSearchForm.addEventListener('submit', onSubmit);
-refLoadMore.addEventListener('click', onMoreClick);
-refNextPage.addEventListener('click', onNextClick);
-refGoTop.addEventListener('click', onGoTopClick);
-
-window.addEventListener('scroll', onScroll);
+window.addEventListener('scroll', debounce(onScroll, DEBOUNCE_DELAY));
 
 function onScroll() {
   const { scrollHeight, clientHeight } = document.documentElement;
-  refGoTop.hidden = scrollY < clientHeight;
-  // refLoadMore.hidden = scrollY < scrollHeight - clientHeight - 400;
-  if (scrollY > scrollHeight - clientHeight - 400) {
-    onMoreClick();
-  }
+  refs.goTopBtn.hidden = scrollY < clientHeight;
+  // refs.addPageBtn.hidden = scrollY < scrollHeight - clientHeight - 400;
 
-  // console.log({ scrollY, scrollTop, scrollHeight, clientHeight });
+  if (scrollY > scrollHeight - clientHeight * 2) {
+    addPage();
+  }
 }
 
-function onMoreClick() {
-  page += 1;
-  showImages();
+async function addPage() {
+  images = await pixabay.getImages();
+  gallery.renderingGallery(images);
+  setInfo();
 }
 
 function onGoTopClick() {
-  page = startPage;
   window.scrollTo(scrollY, 0);
 }
 
-function onNextClick() {
-  page += 1;
-  refGallery.innerHTML = '';
-  showImages();
-}
-
-//********************4 axios */
-function onSubmit(evt) {
+async function onSubmit(evt) {
   evt.preventDefault();
-  query = evt.currentTarget.searchQuery.value
-    .trim()
-    .replace(/ {2,}/g, ' ')
-    .replace(/ /g, '+');
-  refGallery.innerHTML = '';
-  page = 1;
-  showImages();
-}
-async function showImages() {
-  const url = `${BASE_URL}?key=${API_KEY}&image_type=photo&per_page=10&page=${page}&orientation=horizontal&q=${query}`;
-  const { data } = await axios(url);
-  renderingGallery(data.hits);
-  refLoadedPages.textContent = `loaded ${page}`;
+  const formData = new FormData(evt.currentTarget);
+  formData.append('q', strSearchStr(formData.get('searchQuery')));
+  formData.delete('searchQuery');
+  pixabay.setQueryOptions(formData);
+  images = await pixabay.getImages();
+  setInfo();
+  gallery.reset();
+  gallery.renderingGallery(images);
 }
 
-//********************3 axios */
-// async function onSubmit(evt) {
-//   evt.preventDefault();
-//   const result = await axios(url);
-//   renderingGallery(result.data.hits);
-// }
-
-//********************2 */
-// async function onSubmit(evt) {
-//   evt.preventDefault();
-//   const data = await (await fetch(url)).json();
-//   renderingGallery(data.hits);
-// }
-
-//********************1 */
-// function onSubmit(evt) {
-//   evt.preventDefault();
-//   fetch(url)
-//     .then(response => response.json())
-//     .then(data => renderingGallery(data.hits));
-// }
-//******************* */
-
-function renderingGallery(images) {
-  const galleryMarkUp = images.map(makeGalleryItem).join('');
-  // refGallery.innerHTML = galleryMarkUp;
-  refGallery.insertAdjacentHTML('beforeend', galleryMarkUp);
+function strSearchStr(str) {
+  return str.trim().replace(/ {2,}/g, ' ').replace(/ /g, '+');
 }
-function makeGalleryItem(item) {
-  const {
-    largeImageURL,
-    webformatURL,
-    tags,
-    likes,
-    views,
-    comments,
-    downloads,
-  } = item;
 
-  return `<div class="photo-card" >
-           <a class="gallery__item"
-             href="${largeImageURL}">
-             <img
-               src="${webformatURL}" 
-               alt="${tags}"
-               loading="lazy" />
-           </a>
-           <div class="info">
-             <p class="info-item">Likes
-               <p>${likes}</p>
-             </p>
-             <p class="info-item">Views
-               <p>${views}</p>
-             </p>
-             <p class="info-item">Comments
-               <p>${comments}</p>
-             </p>
-             <p class="info-item">Downloads
-               <p>${downloads}</p>
-             </p>
-           </div>
-          </div>`;
+function setInfo() {
+  const { totalHits, availableHits, totalPages, currentPage } =
+    pixabay.getPageOptions();
+  refs.totalImages.textContent = `${totalHits} images found`;
+  refs.availableImages.textContent = `${availableHits} images available`;
+  refs.totalPages.textContent = `${totalPages} pages`;
+  refs.loadedPages.textContent = `loaded ${currentPage} pages`;
 }

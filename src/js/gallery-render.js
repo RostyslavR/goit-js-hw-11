@@ -1,40 +1,27 @@
-import refs from './refs';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+
 const sLbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
 });
+
 export default class GalleryRender {
-  constructor() {}
+  constructor(refGallery) {
+    this.gallery = refGallery;
+  }
 
-  addPageBefore(images) {
-    const galleryMarkUp = images.map(this.makeGalleryItem).join('');
-    refs.gallery.insertAdjacentHTML('afterbegin', galleryMarkUp);
+  reset() {
+    this.gallery.innerHTML = '';
+  }
+
+  renderingGallery(images) {
+    const galleryMarkUp = images.map(this.galleryItem).join('');
+    this.gallery.insertAdjacentHTML('beforeend', galleryMarkUp);
     sLbox.refresh();
   }
 
-  addPageAfter(images) {
-    const galleryMarkUp = images.map(this.makeGalleryItem).join('');
-    refs.gallery.insertAdjacentHTML('beforeend', galleryMarkUp);
-    sLbox.refresh();
-  }
-
-  renderingGallery(images, currentPage = 1, k = 0) {
-    const galleryMarkUp = images.map(this.makeGalleryItem).join('');
-    if (k === 0) {
-      refs.gallery.innerHTML = galleryMarkUp;
-    }
-    if (k > 0) {
-      refs.gallery.insertAdjacentHTML('beforeend', galleryMarkUp);
-    }
-    // if (k < 0) {
-    //   refs.gallery.insertAdjacentHTML('afterbegin', galleryMarkUp);
-    // }
-    sLbox.refresh();
-  }
-
-  makeGalleryItem(item) {
+  galleryItem(item) {
     const {
       largeImageURL,
       webformatURL,
