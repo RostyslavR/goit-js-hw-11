@@ -17,11 +17,15 @@
           </label>
         </div>
         <div class="pagination">
-          <p>pagination</p>
-          <label>
-            <input type="number" name="per_page" value="3" />
-            per page
-          </label>
+          <div>per page</div>
+          <input
+            type="number"
+            name="per_page"
+            value="20"
+            required
+            min="3"
+            max="200"
+          />
         </div>
       </div>
       <div class="searh-block">
@@ -39,10 +43,6 @@
       <div id="available-images">0 images available</div>
       <div id="total-pages">0 pages</div>
       <div id="loaded-pages">loaded 0</div>
-    </div>
-    <div class="btn-block">
-      <button type="button" class="go-top" hidden>Go top</button>
-      <button type="button" class="add-page" hidden>add page</button>
     </div>
   </div>
 </header>

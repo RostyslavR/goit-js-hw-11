@@ -1,10 +1,8 @@
-import refs from './refs';
 export default function () {
   document
     .querySelectorAll('input[type="checkbox"]')
     .forEach(checkbox => (checkbox.checked = true));
-  refs.searchForm.per_page.value = 4;
+  document.querySelector('#search-form').per_page.value = 40;
   // refs.searchForm.by_page.checked = false;
-  // refs.searchForm.searchQuery.value = 'white roses';
+  document.querySelector('#search-form').searchQuery.value = 'white roses';
 }
-//

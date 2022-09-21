@@ -20,6 +20,7 @@ export default class PixabayApiService {
       key: this.API_KEY,
       page: 0,
     };
+    this.pageOptions.totalPages = 1;
   }
 
   setQueryOptions(queryData) {
