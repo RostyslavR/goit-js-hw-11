@@ -8,12 +8,9 @@ import 'notiflix/dist/notiflix-3.2.5.min.css';
 
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '1631539-db8210cabd2636c6df59812df';
-const DEBOUNCE_DELAY = 20;
+const DEBOUNCE_DELAY = 30;
 
 setDefault();
-Notify.init({
-  position: 'center-top',
-});
 
 const pixabay = new PixabayApiService();
 const gallery = new GalleryRender(refs.gallery);
@@ -25,22 +22,21 @@ window.addEventListener('scroll', debounce(onScroll, DEBOUNCE_DELAY));
 
 function onScroll() {
   const { scrollHeight, clientHeight } = document.documentElement;
-  refs.goTopBtn.hidden = scrollY < clientHeight * 2;
-
-  if (scrollY > scrollHeight - clientHeight * 2) {
+  refs.goTopBtn.hidden = scrollY < clientHeight;
+  const lY = scrollHeight - clientHeight * 1.5;
+  if (scrollY > lY && lY > 0) {
     addPage();
   }
 }
 
 async function addPage() {
   try {
-    images = await pixabay.getImages();
+    const images = await pixabay.getImages();
     gallery.renderingGallery(images);
     setInfo();
     if (!images.length) {
-      console.log(images.length);
       Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
+        "We're sorry, but you've reached the end of search results."
       );
     }
   } catch {
@@ -55,17 +51,18 @@ function onGoTopClick() {
 
 async function onSubmit(evt) {
   evt.preventDefault();
+  gallery.reset();
+  onGoTopClick();
   const formData = new FormData(evt.currentTarget);
   formData.append('q', strSearchStr(formData.get('searchQuery')));
   formData.delete('searchQuery');
   pixabay.setQueryOptions(formData);
   try {
     const images = await pixabay.getImages();
-    setInfo();
-    gallery.reset();
+    const totalImages = setInfo();
+    Notify.success(`Hooray! We found ${totalImages} images.`);
     gallery.renderingGallery(images);
     if (!images.length) {
-      console.log(images.length);
       Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
@@ -87,4 +84,5 @@ function setInfo() {
   refs.availableImages.textContent = `${availableHits} images available`;
   refs.totalPages.textContent = `${totalPages} pages`;
   refs.loadedPages.textContent = `loaded ${currentPage} pages`;
+  return totalHits;
 }
