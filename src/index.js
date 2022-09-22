@@ -18,7 +18,11 @@ const gallery = new GalleryRender(refs.gallery);
 refs.searchForm.addEventListener('submit', onSubmit);
 refs.goTopBtn.addEventListener('click', onGoTopClick);
 
-window.addEventListener('scroll', debounce(onScroll, DEBOUNCE_DELAY));
+// window.addEventListener('scroll', onScroll);
+
+// function onScrollD() {
+//   debounce(onScroll, DEBOUNCE_DELAY);
+// }
 
 function onScroll() {
   const { scrollHeight, clientHeight } = document.documentElement;
@@ -30,11 +34,12 @@ function onScroll() {
 }
 
 async function addPage() {
+  window.removeEventListener('scroll', onScroll);
   try {
     const images = await pixabay.getImages();
     gallery.renderingGallery(images);
-    setInfo();
-    if (!images.length) {
+    const { totalPages, currentPage } = setInfo();
+    if (!(totalPages - currentPage)) {
       Notify.failure(
         "We're sorry, but you've reached the end of search results."
       );
@@ -51,6 +56,7 @@ function onGoTopClick() {
 
 async function onSubmit(evt) {
   evt.preventDefault();
+  window.addEventListener('scroll', onScroll);
   gallery.reset();
   onGoTopClick();
   const formData = new FormData(evt.currentTarget);
@@ -59,8 +65,9 @@ async function onSubmit(evt) {
   pixabay.setQueryOptions(formData);
   try {
     const images = await pixabay.getImages();
-    const totalImages = setInfo();
-    Notify.success(`Hooray! We found ${totalImages} images.`);
+    const { totalHits } = setInfo();
+    console.log(totalHits);
+    Notify.success(`Hooray! We found ${totalHits} images.`);
     gallery.renderingGallery(images);
     if (!images.length) {
       Notify.failure(
@@ -84,5 +91,5 @@ function setInfo() {
   refs.availableImages.textContent = `${availableHits} images available`;
   refs.totalPages.textContent = `${totalPages} pages`;
   refs.loadedPages.textContent = `loaded ${currentPage} pages`;
-  return totalHits;
+  return { totalHits, totalPages, currentPage };
 }
