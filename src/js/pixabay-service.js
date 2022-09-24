@@ -12,6 +12,7 @@ export default class PixabayApiService {
       hitsPerPage: 1,
       totalPages: 1,
       currentPage: 0,
+      // end: false,
     };
   }
 
@@ -49,6 +50,10 @@ export default class PixabayApiService {
       this.pageOptions.availableHits / this.pageOptions.hitsPerPage
     );
     this.pageOptions.currentPage = this.queryOptions.page;
+    // this.pageOptions.end = !(
+    //   this.pageOptions.totalPages - this.pageOptions.page
+    // );
+    // console.log(this.pageOptions.end);
   }
 
   getPageOptions() {

@@ -10,6 +10,8 @@ const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '1631539-db8210cabd2636c6df59812df';
 const DEBOUNCE_DELAY = 30;
 
+const endOfImages = false;
+
 setDefault();
 
 const pixabay = new PixabayApiService();
@@ -18,7 +20,18 @@ const gallery = new GalleryRender(refs.gallery);
 refs.searchForm.addEventListener('submit', onSubmit);
 refs.goTopBtn.addEventListener('click', onGoTopClick);
 
-// window.addEventListener('scroll', onScroll);
+window.addEventListener('wheel', debounce(onScrollx, DEBOUNCE_DELAY));
+
+function onScrollx(e) {
+  const { scrollHeight, clientHeight } = document.documentElement;
+  // window.removeEventListener('wheel', onScrollx, { once: true });
+  if (scrollHeight - scrollY < clientHeight * 2 && !endOfImages) {
+    addPage();
+  }
+  // window.addEventListener('wheel', onScrollx, { once: true });
+
+  console.log(scrollHeight, clientHeight, scrollY, e.deltaY);
+}
 
 // function onScrollD() {
 //   debounce(onScroll, DEBOUNCE_DELAY);
@@ -34,12 +47,13 @@ function onScroll() {
 }
 
 async function addPage() {
-  window.removeEventListener('scroll', onScroll);
+  // window.removeEventListener('scroll', onScroll);
   try {
     const images = await pixabay.getImages();
     gallery.renderingGallery(images);
-    const { totalPages, currentPage } = setInfo();
-    if (!(totalPages - currentPage)) {
+    const { end } = setInfo();
+    endOfImages = end;
+    if (endOfImages) {
       Notify.failure(
         "We're sorry, but you've reached the end of search results."
       );
@@ -56,7 +70,7 @@ function onGoTopClick() {
 
 async function onSubmit(evt) {
   evt.preventDefault();
-  window.addEventListener('scroll', onScroll);
+  // window.addEventListener('scroll', onScroll);
   gallery.reset();
   onGoTopClick();
   const formData = new FormData(evt.currentTarget);
@@ -65,7 +79,9 @@ async function onSubmit(evt) {
   pixabay.setQueryOptions(formData);
   try {
     const images = await pixabay.getImages();
-    const { totalHits } = setInfo();
+    const { totalHits, end } = setInfo();
+    // endOfImages = end;
+    // console.log(end);
     console.log(totalHits);
     Notify.success(`Hooray! We found ${totalHits} images.`);
     gallery.renderingGallery(images);
@@ -91,5 +107,5 @@ function setInfo() {
   refs.availableImages.textContent = `${availableHits} images available`;
   refs.totalPages.textContent = `${totalPages} pages`;
   refs.loadedPages.textContent = `loaded ${currentPage} pages`;
-  return { totalHits, totalPages, currentPage };
+  return { currentPage, totalHits };
 }
