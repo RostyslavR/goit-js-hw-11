@@ -5,32 +5,33 @@ export default class PixabayApiService {
   API_KEY = '1631539-db8210cabd2636c6df59812df';
   constructor() {
     this.queryOptions = {};
+    this.pageOptions = {};
+    this.resetOptions();
+  }
 
+  resetOptions() {
+    this.queryOptions = {
+      key: this.API_KEY,
+      page: 1,
+    };
     this.pageOptions = {
       totalHits: 0,
       availableHits: 0,
-      hitsPerPage: 1,
-      totalPages: 1,
+      hitsPerPage: 0,
+      totalPages: 0,
       currentPage: 0,
-      // end: false,
+      thereIsHits: 0,
     };
-  }
-
-  resetQueryOptions() {
-    this.queryOptions = {
-      key: this.API_KEY,
-      page: 0,
-    };
-    this.pageOptions.totalPages = 1;
   }
 
   setQueryOptions(queryData) {
-    this.resetQueryOptions();
+    this.resetOptions();
     queryData.forEach((value, key) => (this.queryOptions[key] = value));
   }
 
   async getImages() {
-    if (this.nextPage()) {
+    if (this.queryOptions.page) {
+      console.log(this.queryOptions.page);
       const result = await axios.get(this.BASE_URL, {
         params: this.queryOptions,
       });
@@ -49,22 +50,23 @@ export default class PixabayApiService {
     this.pageOptions.totalPages = Math.ceil(
       this.pageOptions.availableHits / this.pageOptions.hitsPerPage
     );
-    this.pageOptions.currentPage = this.queryOptions.page;
-    // this.pageOptions.end = !(
-    //   this.pageOptions.totalPages - this.pageOptions.page
-    // );
-    // console.log(this.pageOptions.end);
+    if (this.queryOptions.page > 0) {
+      this.pageOptions.currentPage = this.queryOptions.page;
+    }
+    console.log(total, this.pageOptions.totalPages, this.queryOptions.page);
+    if (total === 0 || this.pageOptions.totalPages === this.queryOptions.page) {
+      this.queryOptions.page = 0;
+    }
+    this.pageOptions.thereIsHits = this.queryOptions.page;
+    if (
+      this.queryOptions.page &&
+      this.pageOptions.totalPages > this.queryOptions.page
+    ) {
+      this.queryOptions.page += 1;
+    }
   }
 
   getPageOptions() {
     return this.pageOptions;
-  }
-
-  nextPage() {
-    if (this.queryOptions.page < this.pageOptions.totalPages) {
-      this.queryOptions.page += 1;
-      return true;
-    }
-    return false;
   }
 }
