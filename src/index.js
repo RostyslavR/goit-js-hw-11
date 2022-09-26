@@ -1,4 +1,5 @@
-import debounce from 'lodash.debounce';
+// import debounce from 'lodash.debounce';
+import throttle from 'lodash.throttle';
 import refs from './js/refs';
 import setDefault from './js/set-default';
 import PixabayApiService from './js/pixabay-service';
@@ -8,9 +9,10 @@ import 'notiflix/dist/notiflix-3.2.5.min.css';
 
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '1631539-db8210cabd2636c6df59812df';
-const DEBOUNCE_DELAY = 25;
+// const DEBOUNCE_DELAY = 25;
+const THROTTLE_DELAY = 300;
 
-const info = {};
+// const info = {};
 
 setDefault();
 
@@ -18,6 +20,7 @@ const pixabay = new PixabayApiService();
 const gallery = new GalleryRender(refs.gallery);
 
 refs.searchForm.addEventListener('submit', onSubmit);
+refs.goTopBtn.addEventListener('click', onGoTopClick);
 
 async function onSubmit(evt) {
   evt.preventDefault();
@@ -50,7 +53,8 @@ async function onSubmit(evt) {
   }
 }
 
-const onScrollD = debounce(onScroll, DEBOUNCE_DELAY);
+// const onScrollD = debounce(onScroll, DEBOUNCE_DELAY);
+const onScrollD = throttle(onScroll, THROTTLE_DELAY);
 
 function strSearchStr(str) {
   return str.trim().replace(/ {2,}/g, ' ').replace(/ /g, '+');
@@ -69,7 +73,7 @@ function setInfo() {
 function onScroll() {
   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
   // if (scrollY > clientHeight) {
-  //   refs.goTopBtn.hidden = false;
+  refs.goTopBtn.hidden = scrollY < clientHeight;
   //   refs.goTopBtn.addEventListener('click', onGoTopClick);
   // } else {
   //   refs.goTopBtn.hidden = true;
@@ -82,9 +86,9 @@ function onScroll() {
   }
 }
 
-// function onGoTopClick() {
-//   window.scrollTo(scrollY, 0);
-// }
+function onGoTopClick() {
+  window.scrollTo(scrollY, 0);
+}
 
 async function addPage() {
   try {
