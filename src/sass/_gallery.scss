@@ -1,12 +1,8 @@
-.gallery-section {
-  // padding-top: 15px;
-}
-
 .gallery {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
-  margin-top: 110px;
+  margin-top: 115px;
   justify-content: center;
 }
 
@@ -16,18 +12,16 @@
   transition: transform var(--tm) var(--cubic);
 
   &:hover {
-    transform: scale(1.03);
+    transform: scale(1.05);
   }
 }
 
 .info {
   display: flex;
-  // padding-left: 20px;
-  justify-content: center;
-
   gap: 20px;
-  background-color: aliceblue;
-  border-radius: 5px;
+  justify-content: center;
+  background-color: var(--active-color);
+  border-radius: 0 0 5px 5px;
   cursor: pointer;
 }
 

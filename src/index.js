@@ -7,12 +7,8 @@ import GalleryRender from './js/gallery-render';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import 'notiflix/dist/notiflix-3.2.5.min.css';
 
-const BASE_URL = 'https://pixabay.com/api/';
-const API_KEY = '1631539-db8210cabd2636c6df59812df';
 // const DEBOUNCE_DELAY = 25;
-const THROTTLE_DELAY = 300;
-
-// const info = {};
+const THROTTLE_DELAY = 700;
 
 setDefault();
 
@@ -53,43 +49,6 @@ async function onSubmit(evt) {
   }
 }
 
-// const onScrollD = debounce(onScroll, DEBOUNCE_DELAY);
-const onScrollD = throttle(onScroll, THROTTLE_DELAY);
-
-function strSearchStr(str) {
-  return str.trim().replace(/ {2,}/g, ' ').replace(/ /g, '+');
-}
-
-function setInfo() {
-  const { totalHits, availableHits, totalPages, currentPage, thereIsHits } =
-    pixabay.getPageOptions();
-  refs.totalImages.textContent = `${totalHits} images found`;
-  refs.availableImages.textContent = `${availableHits} images available`;
-  refs.totalPages.textContent = `${totalPages} pages`;
-  refs.loadedPages.textContent = `loaded ${currentPage} pages`;
-  return { totalHits, thereIsHits };
-}
-
-function onScroll() {
-  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-  // if (scrollY > clientHeight) {
-  refs.goTopBtn.hidden = scrollY < clientHeight;
-  //   refs.goTopBtn.addEventListener('click', onGoTopClick);
-  // } else {
-  //   refs.goTopBtn.hidden = true;
-  //   refs.goTopBtn.removeEventListener('click', onGoTopClick);
-  // }
-
-  if (scrollTop + clientHeight * 2 > scrollHeight) {
-    // if (scrollTop + clientHeight > scrollHeight - clientHeight) {
-    addPage();
-  }
-}
-
-function onGoTopClick() {
-  window.scrollTo(scrollY, 0);
-}
-
 async function addPage() {
   try {
     const images = await pixabay.getImages();
@@ -105,4 +64,33 @@ async function addPage() {
     console.log(error);
     Notify.failure('Error!');
   }
+}
+
+const onScrollD = throttle(onScroll, THROTTLE_DELAY);
+function onScroll() {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+  refs.goTopBtn.hidden = scrollY < clientHeight;
+  if (scrollTop + clientHeight * 2 > scrollHeight) {
+    addPage();
+  }
+}
+
+function onGoTopClick() {
+  window.scrollTo(scrollY, 0);
+}
+
+function strSearchStr(str) {
+  return str.trim().replace(/ {2,}/g, ' ').replace(/ /g, '+');
+}
+
+function setInfo() {
+  const { totalHits, availableHits, totalPages, currentPage, thereIsHits } =
+    pixabay.getPageOptions();
+  refs.infoBlock.innerHTML = `
+      <div>${totalHits} images found</div>
+      <div>${availableHits} images available</div>
+      <div>${totalPages} pages</div>
+      <div>loaded ${currentPage} pages</div>
+  `;
+  return { totalHits, thereIsHits };
 }

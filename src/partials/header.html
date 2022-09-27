@@ -15,17 +15,17 @@
             <input type="checkbox" name="safesearch" value="true" />
             safesearch
           </label>
-        </div>
-        <div class="pagination">
-          <div>per page</div>
-          <input
-            type="number"
-            name="per_page"
-            value="20"
-            required
-            min="10"
-            max="200"
-          />
+          <div>
+            per page
+            <input
+              type="number"
+              name="per_page"
+              value="20"
+              required
+              min="10"
+              max="200"
+            />
+          </div>
         </div>
       </div>
       <div class="searh-block">
@@ -38,13 +38,6 @@
         <button type="submit">Search</button>
       </div>
     </form>
-    <div class="info-block">
-      <div id="total-images" data-name="total-images">0 images found</div>
-      <div id="available-images" data-name="available-images">
-        0 images available
-      </div>
-      <div id="total-pages" data-name="total-pages">0 pages</div>
-      <div id="loaded-pages" data-name="loaded-pages">loaded 0</div>
-    </div>
+    <div class="info-block"></div>
   </div>
 </header>

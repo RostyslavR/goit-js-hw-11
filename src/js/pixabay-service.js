@@ -14,6 +14,7 @@ export default class PixabayApiService {
       key: this.API_KEY,
       page: 1,
     };
+
     this.pageOptions = {
       totalHits: 0,
       availableHits: 0,
@@ -31,7 +32,6 @@ export default class PixabayApiService {
 
   async getImages() {
     if (this.queryOptions.page) {
-      console.log(this.queryOptions.page);
       const result = await axios.get(this.BASE_URL, {
         params: this.queryOptions,
       });
@@ -53,7 +53,6 @@ export default class PixabayApiService {
     if (this.queryOptions.page > 0) {
       this.pageOptions.currentPage = this.queryOptions.page;
     }
-    console.log(total, this.pageOptions.totalPages, this.queryOptions.page);
     if (total === 0 || this.pageOptions.totalPages === this.queryOptions.page) {
       this.queryOptions.page = 0;
     }
