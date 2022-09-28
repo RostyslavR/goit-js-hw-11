@@ -3,16 +3,13 @@ import axios from 'axios';
 export default class PixabayApiService {
   BASE_URL = 'https://pixabay.com/api/';
   API_KEY = '1631539-db8210cabd2636c6df59812df';
-  constructor() {
-    this.queryOptions = {};
-    this.pageOptions = {};
-    this.resetOptions();
-  }
+  constructor() {}
 
   resetOptions() {
     this.queryOptions = {
       key: this.API_KEY,
       page: 1,
+      per_page: 20,
     };
 
     this.pageOptions = {
@@ -21,7 +18,7 @@ export default class PixabayApiService {
       hitsPerPage: 0,
       totalPages: 0,
       currentPage: 0,
-      thereIsHits: 0,
+      thereAreHits: 0,
     };
   }
 
@@ -43,26 +40,46 @@ export default class PixabayApiService {
     }
   }
 
-  setPageOptions(total, totalHits) {
-    this.pageOptions.totalHits = total;
-    this.pageOptions.availableHits = totalHits;
-    this.pageOptions.hitsPerPage = this.queryOptions.per_page;
-    this.pageOptions.totalPages = Math.ceil(
-      this.pageOptions.availableHits / this.pageOptions.hitsPerPage
-    );
-    if (this.queryOptions.page > 0) {
-      this.pageOptions.currentPage = this.queryOptions.page;
+  setPageOptions(total, tlHits) {
+    let {
+      totalHits,
+      availableHits,
+      hitsPerPage,
+      totalPages,
+      currentPage,
+      thereAreHits,
+    } = this.pageOptions;
+
+    let { per_page, page, ...restQueryOptions } = this.queryOptions;
+
+    totalHits = total;
+    availableHits = tlHits;
+    hitsPerPage = per_page;
+    totalPages = Math.ceil(availableHits / hitsPerPage);
+    if (page > 0) {
+      currentPage = page;
     }
-    if (total === 0 || this.pageOptions.totalPages === this.queryOptions.page) {
-      this.queryOptions.page = 0;
+    if (total === 0 || totalPages === page) {
+      page = 0;
     }
-    this.pageOptions.thereIsHits = this.queryOptions.page;
-    if (
-      this.queryOptions.page &&
-      this.pageOptions.totalPages > this.queryOptions.page
-    ) {
-      this.queryOptions.page += 1;
+    thereAreHits = page;
+    if (page > 0 && totalPages > page) {
+      page += 1;
     }
+
+    this.pageOptions = {
+      totalHits,
+      availableHits,
+      hitsPerPage,
+      totalPages,
+      currentPage,
+      thereAreHits,
+    };
+    this.queryOptions = {
+      per_page,
+      page,
+      ...restQueryOptions,
+    };
   }
 
   getPageOptions() {

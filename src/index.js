@@ -1,17 +1,15 @@
-// import debounce from 'lodash.debounce';
 import throttle from 'lodash.throttle';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import 'notiflix/dist/notiflix-3.2.5.min.css';
 import refs from './js/refs';
 import setDefault from './js/set-default';
 import PixabayApiService from './js/pixabay-service';
 import GalleryRender from './js/gallery-render';
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import 'notiflix/dist/notiflix-3.2.5.min.css';
-
-// const DEBOUNCE_DELAY = 25;
-const THROTTLE_DELAY = 700;
 
 setDefault();
 
+const THROTTLE_DELAY = 700;
+const onScrollD = throttle(onScroll, THROTTLE_DELAY);
 const pixabay = new PixabayApiService();
 const gallery = new GalleryRender(refs.gallery);
 
@@ -21,17 +19,20 @@ refs.goTopBtn.addEventListener('click', onGoTopClick);
 async function onSubmit(evt) {
   evt.preventDefault();
   gallery.reset();
+
   const formData = new FormData(evt.currentTarget);
   formData.append('q', strSearchStr(formData.get('searchQuery')));
   formData.delete('searchQuery');
+
   pixabay.setQueryOptions(formData);
+
   try {
     const images = await pixabay.getImages();
     if (images.length) {
-      const { totalHits, thereIsHits } = setInfo();
+      const { totalHits, thereAreHits } = setInfo();
       Notify.success(`Hooray! We found ${totalHits} images.`);
       gallery.renderingGallery(images);
-      if (thereIsHits) {
+      if (thereAreHits) {
         window.addEventListener('scroll', onScrollD);
       } else {
         Notify.failure(
@@ -52,9 +53,9 @@ async function onSubmit(evt) {
 async function addPage() {
   try {
     const images = await pixabay.getImages();
-    const { thereIsHits } = setInfo();
+    const { thereAreHits } = setInfo();
     gallery.renderingGallery(images);
-    if (!thereIsHits) {
+    if (!thereAreHits) {
       window.removeEventListener('scroll', onScrollD);
       Notify.failure(
         "We're sorry, but you've reached the end of search results."
@@ -66,7 +67,6 @@ async function addPage() {
   }
 }
 
-const onScrollD = throttle(onScroll, THROTTLE_DELAY);
 function onScroll() {
   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
   refs.goTopBtn.hidden = scrollY < clientHeight;
@@ -84,7 +84,7 @@ function strSearchStr(str) {
 }
 
 function setInfo() {
-  const { totalHits, availableHits, totalPages, currentPage, thereIsHits } =
+  const { totalHits, availableHits, totalPages, currentPage, thereAreHits } =
     pixabay.getPageOptions();
   refs.infoBlock.innerHTML = `
       <div>${totalHits} images found</div>
@@ -92,5 +92,5 @@ function setInfo() {
       <div>${totalPages} pages</div>
       <div>loaded ${currentPage} pages</div>
   `;
-  return { totalHits, thereIsHits };
+  return { totalHits, thereAreHits };
 }
