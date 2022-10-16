@@ -79,7 +79,8 @@ function onGoTopClick() {
   window.scrollTo(scrollY, 0);
 }
 
-function strSearchStr(str) {
+function strSearchStr(str) {     
+// replacing spaces between words with a plus (" +") and removing all other spaces//
   return str.trim().replace(/ {2,}/g, ' ').replace(/ /g, '+');
 }
 
